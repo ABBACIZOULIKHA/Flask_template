@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, Float, DateTime
 from app import db
 
 
+
 class Product(db.Model):
     __tablename__ = 'product'
 
@@ -13,7 +14,8 @@ class Product(db.Model):
     description = Column(String(255), nullable=True)
     quantity = Column(Integer, nullable=False)
     category = Column(String(50), nullable=False)
-    date = Column(DateTime, default=datetime.now, nullable=False)  # Date par défaut
+    date = Column(DateTime, default=datetime.now, nullable=False)
+    image_filename = Column(String(255), nullable=True)  # Champ pour l'image
 
     def to_dict(self):
         return {
@@ -24,5 +26,6 @@ class Product(db.Model):
             "description": self.description,
             "quantity": self.quantity,
             "category": self.category,
-            "date": self.date.isoformat()
+            "date": self.date.isoformat(),
+            "image_filename": self.image_filename
         }
