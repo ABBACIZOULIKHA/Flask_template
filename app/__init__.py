@@ -37,8 +37,8 @@ def create_app():
     # Importer et enregistrer les blueprints
     from .routes.product_routes import product_bp
     from .routes.seller_routes import seller_bp
-
-    app.register_blueprint(product_bp, url_prefix='/products')
+    
+    app.register_blueprint(product_bp, url_prefix="/products")   
     app.register_blueprint(seller_bp, url_prefix='/sellers')
     
     return app

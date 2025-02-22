@@ -1,39 +1,24 @@
-from flask import Blueprint, jsonify, request
-from werkzeug.utils import secure_filename
-import os
-from ..models.product import Product
-from .. import db
-from flask import current_app
+from flask import Blueprint, request
+from controllers.product_controller import get_all_products, get_product_by_id, create_product, update_product, delete_product
 
-product_bp = Blueprint('products', __name__)
+product_bp = Blueprint("product_bp", __name__)
 
-# Fonction pour vérifier les extensions de fichiers autorisées
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@product_bp.route('/', methods=['GET'])
+@product_bp.route("/", methods=["GET"])
 def get_products():
-    products = Product.query.all()
-    return jsonify([product.to_dict() for product in products])
+    return get_all_products()
 
-@product_bp.route('/', methods=['POST'])
+@product_bp.route("/<int:product_id>", methods=["GET"])
+def get_product(product_id):
+    return get_product_by_id(product_id)
+
+@product_bp.route("/", methods=["POST"])
 def add_product():
-    # Récupérer les données envoyées en form-data, y compris l'image
-    data = request.form.to_dict()  # Convertir ImmutableMultiDict en dictionnaire mutable
-    image = request.files.get('image')  # Récupérer l'image du formulaire
+    return create_product()
 
-    if image and allowed_file(image.filename):
-        # Sauvegarder l'image dans le dossier 'uploads'
-        filename = secure_filename(image.filename)
-        image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        image.save(image_path)
-        data['image_filename'] = filename  # Ajouter le nom de fichier dans les données
-    elif image:
-        return jsonify({"error": "Image file is not allowed. Only PNG, JPG, JPEG, and GIF are supported."}), 400
+@product_bp.route("/<int:product_id>", methods=["PUT"])
+def edit_product(product_id):
+    return update_product(product_id)
 
-    # Créer un nouveau produit avec les données récupérées
-    new_product = Product(**data)
-    db.session.add(new_product)
-    db.session.commit()
-    return jsonify(new_product.to_dict()), 201
+@product_bp.route("/<int:product_id>", methods=["DELETE"])
+def remove_product(product_id):
+    return delete_product(product_id)
